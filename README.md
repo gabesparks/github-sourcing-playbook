@@ -5,7 +5,7 @@
 
 Most job boards surface who's looking. GitHub surfaces who's building. This playbook walks through how to use GitHub strategically to identify, evaluate, and reach out to engineers based on what they've actually shipped, not just what they've written on a resume.
 
-It pairs directly with the [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide), a CLI tool built specifically for this workflow. You'll see exactly where it fits in as you go through the steps.
+It pairs directly with the [GitHub & NPM Sourcing Toolkit](https://github.com/gabesparks/github-npm-sourcing-guide), a set of four CLI tools built specifically for this workflow. You'll see exactly where each tool fits as you go through the steps.
 
 ---
 
@@ -17,9 +17,24 @@ Unlike LinkedIn, nobody's gaming their GitHub profile for recruiters. What you s
 
 ---
 
+## The Toolkit
+
+This playbook is built around four CLI tools that work individually or together:
+
+| Tool | What it does | When to use it |
+|---|---|---|
+| `recruit.js` | Full pipeline in one command | Starting from scratch with a tech stack |
+| `repofinder.js` | Finds high-signal repos by tech stack | When you need to identify target repos |
+| `sourcer.js` | Pulls top contributors from any repo | When you already have a target repo |
+| `profiler.js` | Deep-evaluates a specific GitHub profile | Before reaching out to a candidate |
+
+Setup instructions and full documentation are in the [toolkit repo](https://github.com/gabesparks/github-npm-sourcing-guide).
+
+---
+
 ## Understanding the Tech Stack
 
-Before you start searching, get clear on what you're looking for. Every engineering role has a core set of technologies that should guide how you read GitHub profiles.
+Before you start, get clear on what you're looking for. Every engineering role has a core set of technologies that should guide how you read GitHub profiles.
 
 Some common patterns by role type:
 
@@ -46,107 +61,134 @@ A recruiter with a real, recognizable profile gets replies. A recruiter with no 
 
 ---
 
+## The Workflow
+
+There are two paths depending on where you're starting from.
+
+### Path A: Starting from scratch (recommended)
+
+If you have a tech stack but no specific repo in mind, use `recruit.js` to run the full pipeline in one command:
+
+```bash
+GH_TOKEN=ghp_xxxx node recruit.js --stack react,nodejs --top-repos 3 --top-contributors 10
+```
+
+This finds the top repos for your stack, pulls the top contributors from each, evaluates every profile, deduplicates across repos, and outputs a ranked outreach shortlist. One command, ready-to-use results.
+
+```bash
+# More options
+GH_TOKEN=ghp_xxxx node recruit.js --stack solidity,ethereum --top-repos 5 --csv
+GH_TOKEN=ghp_xxxx node recruit.js --stack python,ml --skip-profile
+```
+
+### Path B: Targeted sourcing
+
+If you already know which repo to target, or want more control over each step, run the tools individually:
+
+**Step 1: Find repos**
+```bash
+GH_TOKEN=ghp_xxxx node repofinder.js --stack typescript,react --top 10
+```
+
+**Step 2: Pull contributors**
+```bash
+GH_TOKEN=ghp_xxxx node sourcer.js vercel/next.js --top 15 --csv
+```
+
+**Step 3: Evaluate profiles**
+```bash
+GH_TOKEN=ghp_xxxx node profiler.js sindresorhus
+```
+
+Both paths lead to the same place. Path A is faster. Path B gives you more control.
+
+---
+
 ## Step 1: Find High-Signal Repositories
 
 A high-signal repo has three qualities: it uses the tech stack you're hiring for, it has an active community with frequent commits, and it's respected in the developer ecosystem.
 
-**How to find them:**
+**Use `repofinder.js`** to automate this. It searches GitHub by topic and language, filters out inactive or low-star repos, and returns a ranked list scored by stars, forks, recency, and stack relevance:
 
-Ask your hiring team during intake which repos or libraries they actively use, contribute to, or keep an eye on. These are your starting points and the most valuable ones.
+```bash
+GH_TOKEN=ghp_xxxx node repofinder.js --stack nodejs,typescript --min-stars 1000
+```
 
-Check strong candidates you've already found. Which repos do they contribute to? Those repos attract similar talent. Follow the network.
+**Or find them manually:**
 
-Use GitHub's topic search. Navigate to [github.com/topics](https://github.com/topics) and search by technology: `topic:react`, `topic:nodejs`, `topic:web3`, `topic:kubernetes`. Filter results by most stars or most recently active.
+Ask your hiring team during intake which repos or libraries they actively use or keep an eye on. These are your best starting points.
+
+Check strong candidates you've already found. Which repos do they contribute to? Those repos attract similar talent.
+
+Use GitHub's topic search at [github.com/topics](https://github.com/topics). Search by technology and filter by most stars or most recently active.
 
 Watch GitHub Trending for emerging projects in your target languages. Engineers who contribute early to trending repos tend to be ahead of the curve.
 
-From one good repo, explore related projects from the same organization, its dependencies, or its top contributors' other work. Good repos cluster around good repos.
-
 ---
 
-## Step 2: Pull Top Contributors with the Sourcing Tool
+## Step 2: Pull Top Contributors
 
-Once you have a target repo, this is where the [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide) comes in. Instead of manually clicking through GitHub's contributor pages, one command pulls a ranked, enriched list of top contributors directly in your terminal:
+Once you have a target repo, use `sourcer.js` to pull a ranked, enriched list of top contributors:
 
 ```bash
 GH_TOKEN=ghp_xxxx node sourcer.js <owner/repo> --top 15 --csv
 ```
 
-For example:
+The tool returns each contributor's handle, name, contribution count, followers, account age, location, public email, and a weighted signal score. Bots are automatically filtered out.
 
-```bash
-GH_TOKEN=ghp_xxxx node sourcer.js vercel/next.js --top 15 --csv
-```
-
-The tool returns each contributor's GitHub handle, name, contribution count, followers, public repo count, account age, location, and public email if listed. It also calculates a weighted signal score to help you prioritize outreach. Bots are automatically filtered out.
-
-The `--csv` flag exports everything to a spreadsheet you can drop into your ATS or share with a hiring manager.
-
-If you're sourcing from an NPM package rather than a GitHub repo directly, the tool handles that too:
+It also works with NPM packages directly:
 
 ```bash
 GH_TOKEN=ghp_xxxx node sourcer.js lodash --top 10
 ```
 
-It resolves the package to its linked GitHub repo and runs the same enrichment from there.
-
-For a quick one-off check while browsing a profile, use the bookmarklet included in the sourcing tool repo to instantly pull up any user's full PR history.
+The `--csv` flag exports everything to a spreadsheet you can drop into your ATS or share with a hiring manager.
 
 ---
 
 ## Step 3: Evaluate Profiles
 
-The sourcing tool gives you a starting list. Now you need to decide who's actually worth reaching out to. Use this rubric to build a quick picture. Strong candidates won't check every box. Look for a strong overall signal.
+Before you reach out, run your top picks through `profiler.js` for a full evaluation:
 
-### Technical Alignment
-
-**Languages and frameworks.** Do their repos reflect the core tech you're hiring for? Look at pinned repos and recent activity, not just their bio.
-
-**Role-specific signals.** For blockchain or Web3 roles, look for Solidity, Rust, or C++ work, or contributions to crypto-adjacent projects. For infrastructure roles, look for Kubernetes configs, Terraform, or cloud provider SDKs.
-
-**Quality of repos.** Are they building real things or just completing tutorials? Look for projects that solve actual problems, have users, or have been starred by others in the community.
-
-### Contributions and Activity
-
-**Contribution graph.** Consistent activity over months or years is a better signal than a recent burst. A green graph going back three years tells you something a two-week spike doesn't.
-
-**Recent activity.** Look for commits or updates in the last three to six months. A technically impressive profile that's been dormant for two years is worth a question before you invest time in outreach.
-
-**Original repos vs. forks.** Prioritize original work. Forks only count if they've been meaningfully extended beyond the source material.
-
-### Quality and Recognition
-
-**Stars received.** Stars on personal or authored repos are peer validation. The community voted with their attention.
-
-**Contributions to well-known projects.** Someone who's had a PR merged into React, Node.js, or another major open-source project has had their work reviewed and approved by experts in the field.
-
-**Documentation quality.** Read the README on their best repo. A well-written README signals communication skills as much as technical ability. If they can explain their own project clearly, they can probably explain their work in a standup.
-
-### Collaboration Signals
-
-**Issues and pull requests.** How someone participates in GitHub discussions is incredibly revealing. Check their issue history directly:
-
-```
-https://github.com/issues?q=is%3Aissue+author%3AUSERNAME
+```bash
+GH_TOKEN=ghp_xxxx node profiler.js <username>
 ```
 
-Look for constructive, clear comments. Do they follow up on feedback? Do they handle disagreement professionally? Do other contributors engage positively with their input?
+It scores each profile across five categories and gives you an overall grade and recruiter verdict:
 
-**Code review activity.** Engineers who regularly review other people's code think beyond their own output. That's a signal worth noting.
+**Profile Completeness.** How easy is this person to contact and verify? Name, photo, bio, location, email, website, Twitter.
+
+**Activity and Consistency.** Account age, repo count, followers, days since last active, variety of activity types. Consistent activity over years beats a recent burst.
+
+**Code Quality Signals.** Stars received on original repos, language diversity, ratio of original work to forks, recent maintenance.
+
+**README and Documentation.** Repo descriptions, topics, homepage links, community reception. A well-documented repo signals communication skills as much as technical ability.
+
+**Collaboration Depth.** PR reviews, pull requests submitted, issue participation, contributions to external repos.
+
+**Grading scale:**
+
+| Grade | Score | What it means |
+|---|---|---|
+| A | 85-100 | Strong signal across the board. Prioritize outreach. |
+| B | 65-84 | Solid profile. Worth a conversation. |
+| C | 50-64 | Mixed signals. Dig deeper before reaching out. |
+| D | 35-49 | Thin public profile. May be stronger than GitHub suggests. |
+| F | 0-34 | Limited signal. Consider other sourcing channels. |
 
 ---
 
 ## Step 4: Find Contact Information
 
-The sourcing tool already surfaces public emails and website links where available. For anyone where that comes back empty, here's where else to look:
+The toolkit already surfaces public emails, websites, and Twitter handles automatically. For anyone where that comes back empty:
 
-**Profile bio and links.** Check for LinkedIn or X/Twitter handles listed directly on their GitHub profile page.
+**Profile bio and links.** Check for LinkedIn or X/Twitter handles listed directly on their GitHub profile.
 
 **Commit metadata.** Author emails sometimes appear in commit history. Navigate to any commit and view the raw data.
 
 **NPM registry.** If they've published packages, the package page sometimes includes contact details.
 
-**Cross-platform search.** Try `"username" site:linkedin.com` or `"handle" JavaScript engineer` in Google. Combining their handle with tech keywords usually narrows it down quickly.
+**Cross-platform search.** Try `"username" site:linkedin.com` or `"handle" JavaScript engineer` in Google.
 
 ---
 
@@ -154,11 +196,11 @@ The sourcing tool already surfaces public emails and website links where availab
 
 You've found someone worth reaching out to. Now don't blow it with a generic message.
 
-**Lead with something specific.** Reference a repo, a commit, a project, or a PR. Show them you actually looked. Engineers can spot a copy-paste outreach immediately and they will not respond to it.
+**Lead with something specific.** Reference a repo, a commit, a project, or a PR. Show them you actually looked. Engineers can spot a copy-paste outreach immediately and will not respond to it.
 
 **Keep it short.** Four to six sentences is plenty. Explain who you are, what caught your attention, what the role is, and what you're asking for.
 
-**Make the ask easy.** End with a simple, low-pressure call to action. "Would you be open to a quick chat?" works better than a paragraph about interview processes and next steps.
+**Make the ask easy.** End with a simple, low-pressure call to action. "Would you be open to a quick chat?" works better than a paragraph about next steps.
 
 ### Outreach Templates
 
@@ -180,26 +222,34 @@ Customize every message. The templates are starting points, not scripts.
 
 ## Tips Worth Keeping
 
-**Start with the repo, not the person.** Find a high-signal repo first, then use the sourcing tool to pull its contributors. You'll reach candidates you'd never find through keyword search alone.
+**Use `recruit.js` for speed, individual tools for depth.** The pipeline tool is great for building a first shortlist fast. The individual tools are better when you want to dig into a specific repo or evaluate a specific person.
 
-**Forks reveal intent.** What someone has forked tells you what they're learning or planning to build next. It's a window into their thinking beyond their current role.
-
-**The issues tab is underrated.** How someone handles criticism, bug reports, and feature requests from strangers on the internet says a lot about who they are professionally. More recruiters should read it.
+**Start with the repo, not the person.** Find a high-signal repo first, then use `sourcer.js` to pull its contributors. You'll reach candidates you'd never find through keyword search alone.
 
 **Don't just look at the top contributor.** Number one is often the original author or a core maintainer who isn't going anywhere. Contributors ranked 3 through 10 are often strong engineers who are more reachable and more likely to respond.
 
-**Build lists over time.** Save interesting profiles even if the timing isn't right. GitHub moves fast and people's situations change. A candidate who wasn't open six months ago might be now.
+**The issues tab is underrated.** How someone handles criticism, bug reports, and feature requests from strangers says a lot about who they are professionally.
+
+**Cross-repo presence is a strong signal.** If someone appears as a top contributor in multiple repos in your target stack, that's not a coincidence. `recruit.js` gives them a score bonus for exactly this reason.
+
+**Build lists over time.** Save interesting profiles even if the timing isn't right. A candidate who wasn't open six months ago might be now.
 
 ---
 
 ## The Full Workflow at a Glance
 
+**Fast path:**
+```bash
+GH_TOKEN=ghp_xxxx node recruit.js --stack <your,stack> --top-repos 3 --csv
 ```
-1. Get target repos from your hiring team during intake
-2. Run: node sourcer.js <repo> --top 15 --csv
-3. Review the enriched list and score each profile against the rubric
-4. Find contact info for your top picks
-5. Send a short, specific, personalized outreach message
+
+**Step by step:**
+```
+1. node repofinder.js --stack <your,stack>     # find target repos
+2. node sourcer.js <owner/repo> --csv          # pull top contributors
+3. node profiler.js <username>                 # evaluate your top picks
+4. Find contact info for anyone missing email
+5. Send short, specific, personalized outreach
 6. Repeat with the next repo
 ```
 
@@ -207,7 +257,7 @@ Customize every message. The templates are starting points, not scripts.
 
 ## Related Guides
 
-- [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide) - The CLI tool that powers Step 2 of this workflow
+- [GitHub & NPM Sourcing Toolkit](https://github.com/gabesparks/github-npm-sourcing-guide) - The four CLI tools this playbook is built around
 - [Twitter/X Sourcing Playbook](../twitter-x-sourcing-playbook) - Finding and engaging technical talent where they talk about what they're building
 
 ---
