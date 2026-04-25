@@ -258,7 +258,7 @@ GH_TOKEN=ghp_xxxx node recruit.js --stack <your,stack> --top-repos 3 --csv
 ## Related Guides
 
 - [GitHub & NPM Sourcing Toolkit](https://github.com/gabesparks/github-npm-sourcing-guide) - The four CLI tools this playbook is built around
-- [Twitter/X Sourcing Playbook](../twitter-x-sourcing-playbook) - Finding and engaging technical talent where they talk about what they're building
+- [Twitter/X Sourcing Playbook](https://github.com/gabesparks/twitter-x-sourcing-playbook) - Finding and engaging technical talent where they talk about what they're building
 
 ---
 
