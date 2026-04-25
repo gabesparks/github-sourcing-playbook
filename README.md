@@ -5,7 +5,7 @@
 
 Most job boards surface who's looking. GitHub surfaces who's building. This playbook walks through how to use GitHub strategically to identify, evaluate, and reach out to engineers based on what they've actually shipped, not just what they've written on a resume.
 
-It pairs directly with the [GitHub & NPM Sourcing Tool](../github-npm-sourcing-guide), a CLI tool built specifically for this workflow. You'll see exactly where it fits in as you go through the steps.
+It pairs directly with the [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide), a CLI tool built specifically for this workflow. You'll see exactly where it fits in as you go through the steps.
 
 ---
 
