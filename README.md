@@ -66,7 +66,7 @@ From one good repo, explore related projects from the same organization, its dep
 
 ## Step 2: Pull Top Contributors with the Sourcing Tool
 
-Once you have a target repo, this is where the [GitHub & NPM Sourcing Tool](../github-npm-sourcing-guide) comes in. Instead of manually clicking through GitHub's contributor pages, one command pulls a ranked, enriched list of top contributors directly in your terminal:
+Once you have a target repo, this is where the [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide) comes in. Instead of manually clicking through GitHub's contributor pages, one command pulls a ranked, enriched list of top contributors directly in your terminal:
 
 ```bash
 GH_TOKEN=ghp_xxxx node sourcer.js <owner/repo> --top 15 --csv
