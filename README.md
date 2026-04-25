@@ -207,7 +207,7 @@ Customize every message. The templates are starting points, not scripts.
 
 ## Related Guides
 
-- [GitHub & NPM Sourcing Tool](../github-npm-sourcing-guide) - The CLI tool that powers Step 2 of this workflow
+- [GitHub & NPM Sourcing Tool](https://github.com/gabesparks/github-npm-sourcing-guide) - The CLI tool that powers Step 2 of this workflow
 - [Twitter/X Sourcing Playbook](../twitter-x-sourcing-playbook) - Finding and engaging technical talent where they talk about what they're building
 
 ---
